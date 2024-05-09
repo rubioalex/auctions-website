@@ -1,0 +1,53 @@
+{% extends 'auctions/layout.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block body %}
+
+<p class="subtitle-ph">{{ title }}</p>
+<hr>
+
+
+
+    <form action="create" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="create-form-body">
+            <div class="form-field">
+                <label class="form-label" for="object_name">Name: </label>
+                {{ form.object_name }}
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="category">Category: </label>
+                {{ form.category }} 
+            </div>
+
+
+            <div class="form-field">
+                <label class="form-label" for="description">Description: </label>
+                {{ form.description }}
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="starting_bid">Starting Bid ($): </label>
+                {{ form.starting_bid }}
+            </div>
+
+            {% if error_message %}
+                <div>{{ error_message }}</div>
+            {% endif %}
+
+            <div class="form-field">
+                <label class="form-label" for="image">Image: </label>
+                {{ form.image }}
+            </div>
+
+            <button id="submit-btn" type="submit" class="add-remove-watchlist">Submit</button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

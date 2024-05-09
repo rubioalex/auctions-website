@@ -1,0 +1,50 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Watchlist{% endblock %}
+
+{% block body %}
+    <p class="subtitle-ph">Watchlist</p>
+    <hr>
+
+    {% if watchlist_listings %}
+        {% for listing in watchlist_listings %}
+        <div class="active-listing-container">
+
+        <a href="{% url 'detail' listing.id %}"><div class="img-div">
+            <img class="listing-image" src="{{ listing.image.url }}" alt="">
+        </div></a>
+
+        <div class="listing-details-index">
+
+            <div class="inline-block-elem">
+                <a href="{% url 'detail' listing.id %}">
+                    <span class="listing-title">{{ listing.object_name.title }}</span></a>
+            </div>
+
+            <div class="">
+                <span class="key-ph">STATUS</span> - {% if listing.is_closed %}Closed{% else %}Active{% endif %}
+            </div>
+
+            <div class="">
+                <span class="key-ph">DESCRIPTION</span>
+                <br>
+                {{ listing.description }}
+            </div>
+
+            <div class="">
+                <span class="key-ph">STARTING BID</span> - {{ listing.starting_bid }} $
+            </div>
+
+            <div class="">
+                <span class="key-ph">CATEGORY</span> - {{ listing.category }}
+            </div>
+            
+        </div>
+
+    </div>
+        {% endfor %}
+    {% else %}
+        <p class="">You have no items in your Watchlist.</p>
+        <p>See <a class="color-links" href="{% url 'index' %}">Active Listings</a>.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}My Items{% endblock %}
+
+{% block body %}
+    <p class="subtitle-ph">My Items</p>
+    <hr>
+
+    {% for listing in listings %}
+    <div class="active-listing-container">
+
+        <a href="{% url 'detail' listing.id %}"><div class="img-div">
+            <img class="listing-image" src="{{ listing.image.url }}" alt="">
+        </div></a>
+
+        <div class="listing-details-index">
+
+            <div class="inline-block-elem">
+                <a href="{% url 'detail' listing.id %}">
+                    <span class="listing-title">{{ listing.object_name.title }}</span></a>
+            </div>
+
+            <div class="">
+                <span class="key-ph">STATUS</span> - {% if listing.is_closed %}Closed{% else %}Active{% endif %}
+            </div>
+
+            <div class="">
+                <span class="key-ph">DESCRIPTION</span>
+                <br>
+                {{ listing.description }}
+            </div>
+
+            <div class="">
+                <span class="key-ph">STARTING BID</span> - {{ listing.starting_bid }} $
+            </div>
+
+            <div class="">
+                <span class="key-ph">CATEGORY</span> - {{ listing.category }}
+            </div>
+            
+        </div>
+
+    </div>
+    {% empty %}
+        <p>You have no items. Create a listing <a class="color-links" href="create">here</a>.</p>
+    {% endfor %}
+
+{% endblock %}

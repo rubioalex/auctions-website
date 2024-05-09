@@ -1,0 +1,162 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %} {{ listing.object_name }}{% endblock %}
+
+{% block body %}
+    <div class="">
+
+        {% if "success" in message %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% elif message %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <div class="item-details-container">
+            <img class="listing-image" src="{{ listing.image.url }}" alt="">
+
+            <div class="item-details-description">
+                {% if listing.is_closed %}
+                    <div class="won-item-div">
+                        <p style="margin: 0;">This auction was won by{% if request.user == current_bid.user %} <strong>YOU</strong>{% else %} <strong>@{{ current_bid.user }}</strong>{% endif %} for <strong>{{ current_bid.amount }} $</strong></p>
+                    </div>
+                {% endif %}
+                <p class="listing-title">{{ listing.object_name.title }}</p>
+                <div>
+                    <span class="key-ph">STATUS</span> - {% if listing.is_closed %}Closed{% else %}Active{% endif %}
+                </div>
+
+                <div>
+                    <span class="key-ph">DESCRIPTION</span>
+                    <br>
+                    {{ listing.description }}
+                </div>
+
+                <div>
+                    <span class="key-ph">CATEGORY</span> - {{ listing.category }}
+                </div>
+
+                <div>
+                    <span class="key-ph">STARTING BID</span> - {{ listing.starting_bid }} $
+                </div>
+
+                <div>
+                    <span class="key-ph">SELLER</span> - @{{ listing.created_by }}
+                </div>
+            </div>
+        
+
+            {% if user.is_authenticated %}
+            {% if request.user != listing.created_by and listing.is_closed == False %}
+                {% if listing_in_watchlist %}
+                    <form action="{% url 'remove_from_watchlist' listing.id %}" method="POST" class="">
+                        {% csrf_token %}
+                        <button id="details-watchlist-button" class="add-remove-watchlist" type="submit">Remove from Watchlist</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'add_to_watchlist' listing.id %}" method="POST">
+                        {% csrf_token %}
+                        <button id="details-watchlist-button" class="add-remove-watchlist" type="submit">Add to Watchlist</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+            {% endif %}
+        </div>
+
+        {% if listing.is_closed == False %}
+        <div class="bid1-div">
+            <p style="margin: 0;"><strong>Current bid:</strong>
+                {% if current_bid %}{{ current_bid.amount }} ${% else %}There are no bids for this item yet.{% endif %}</p>
+                {% if current_bid %}
+                    <p style="margin: 0;"><strong>Current winner:</strong> @{{ current_bid.user }}</p>
+                {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if request.user != listing.created_by  and request.user.is_authenticated and listing.is_closed == False %}
+
+            <form action="{% url 'place_bid' listing.id %}" method="POST">
+                {% csrf_token %}
+                <div class="place-bid-form">
+                    <label style="margin: 0;
+                    font-size: 18px;
+                    font-weight: 500;" for="bid_amount">Your Bid:</label>
+                    <input class="place-bid-input" type="number" name="bid_amount" step="0.5" required>
+                    <button class="place-bid-btn" type="submit">Place Bid</button>
+                </div>
+            </form>
+
+        {% elif request.user == listing.created_by and listing.is_closed == False %}
+            <div class="my-items">
+                <div class="you-own-div">
+                    <p style="margin: 0;">You own this item.</p>
+                </div>
+                {% if not listing.is_closed and current_bid %}
+                <form action="{% url 'close_auction' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="close-auction-btn" type="submit">Close Auction</button>
+                </form>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if current_bid %}
+            <div class="bids-history-div">
+                <p class="subtitle-ph">Bid History</p>
+                <hr>
+                <p class="bid-history-ph"><strong>Number of bids</strong> - {{listing.bid_set.all.count}}</p>
+                
+                <div class="div-flex">
+                    {% for bid in listing.bid_set.all %}
+                    <div class="bid-div">
+                        <p style="margin: 0;">@{{ bid.user.username }}</p>
+                        <p style="margin: 0;
+                        font-weight: 500;">{{ bid.amount }} $</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+            </div>
+        {% endif %}
+
+        {% if comments %}
+            <p class="subtitle-ph" style="margin-left: 20px;
+            margin-top: 50px;
+            ">Comments</p>
+            <hr style="margin-left: 20px;">
+            <div class="comms-history-div">
+                {% for comment in comments %}
+                    <div class="comm13">
+                        <div style="display: flex;
+                        justify-content: space-between;">
+                            <p style="font-weight: 600;">@{{ comment.user }}</p>
+                            <p>{{ comment.created_at }}</p>
+                        </div>
+                        
+                        <div class="she-said">{{ comment.comment_body }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <div class="add-comment-div">
+                <p style="font-weight: 500;
+                font-size: 25px;
+                margin: 0;">Add a comment</p>
+                <form action="{% url 'add_comment' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <div style="display: flex;
+                    flex-direction: column;
+                    row-gap: 10px;">
+                        {{ comment_form.comment_body }}
+                        <button class="add-remove-watchlist" id="comm-btn" type="submit">Submit Comment</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block body %}
+    <p class="subtitle-ph">Active Listings in {{ category.name }}</p>
+    <hr>
+
+    {% if listings %}
+        {% for listing in listings %}
+            <div class="active-listing-container">
+
+                <a href="{% url 'detail' listing.id %}"><div class="img-div">
+                    <img class="listing-image" src="{{ listing.image.url }}" alt="">
+                </div></a>
+
+                <div class="listing-details-index">
+                    <div class="inline-block-elem">
+                        <a href="{% url 'detail' listing.id %}">
+                        <span class="listing-title">{{ listing.object_name.title }}</span></a>
+                    </div>
+
+                    <div class="">
+                        <span class="key-ph">STATUS</span> - {% if listing.is_closed %}Closed{% else %}Active{% endif %}
+                    </div>
+
+                    <div class="">
+                        <span class="key-ph">DESCRIPTION</span>
+                        <br>
+                        {{ listing.description }}
+                    </div>
+
+                    <div class="">
+                        <span class="key-ph">STARTING BID</span> - {{ listing.starting_bid }} $
+                    </div>
+
+                    <div class="">
+                        <span class="key-ph">CATEGORY</span> - {{ listing.category }}
+                    </div>
+
+
+                    {% if user.is_authenticated %}
+                    {% if request.user != listing.created_by %}
+                        {% if listing.id in listing_watchlist_dict %}
+                            <form action="{% url 'remove_from_watchlist' listing.id %}" method="POST" class="">
+                                {% csrf_token %}
+                                <button class="add-remove-watchlist" type="submit">Remove from Watchlist</button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'add_to_watchlist' listing.id %}" method="POST">
+                                {% csrf_token %}
+                                <button class="add-remove-watchlist" type="submit">Add to Watchlist</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-closed-ph">No active listings posted for this category.</p>
+        <p class="no-closed-ph">See <a class="color-links" href="{% url 'index' %}">Active Listings</a>.</p>
+    {% endif %}
+{% endblock %}
